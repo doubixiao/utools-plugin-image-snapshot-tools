@@ -1,0 +1,54 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  cursor: move;
+  user-select: none;
+}
+
+body {
+  padding: 10px; /* 四周留白，用于显示边框阴影 */
+  box-sizing: border-box;
+}
+
+#img {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.22), 0 10px 30px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.bar {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+body:hover .bar {
+  opacity: 1;
+}
+
+.bar button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bar button:hover {
+  background: #f5222d;
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>截图工具</title>
+  <link rel="stylesheet" href="index.css?v=20260918" />
+</head>
+<body>
+  <header class="hd">
+    <span class="hd-left">
+      <button id="btn-history" class="hd-btn" title="查看历史截图列表">🕘 历史记录</button>
+      <button id="btn-settings" class="hd-btn" title="OCR 接口与历史清理设置">⚙ 设置</button>
+    </span>
+    <span class="hd-title">截图工具</span>
+    <button id="btn-recapture" class="hd-btn" title="开始新的截图">↻ 重新截图</button>
+  </header>
+
+  <!-- 截图结果视图 -->
+  <main id="view-result" class="view">
+    <div id="preview" class="preview">
+      <div id="placeholder" class="placeholder">
+        <div id="ph-status" class="ph-text">📷 正在启动截图…</div>
+        <div class="ph-sub">首次进入会自动开始截图，若无响应请点击下方按钮</div>
+        <button id="btn-ph-capture" class="ph-btn">开始截图</button>
+      </div>
+      <div id="stage" class="stage hidden">
+        <div id="wrap">
+          <img id="img" alt="截图预览" />
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+      <div id="hint" class="hint hidden">在图片上拖拽鼠标绘制框线 · Esc 退出框图</div>
+    </div>
+
+    <div id="drawbar" class="bar hidden">
+      <div id="colors" class="colors" title="框线颜色"></div>
+      <button id="btn-undo" title="撤销上一个框">撤销</button>
+      <button id="btn-clear" title="清除全部框">清空</button>
+      <button id="btn-done" class="primary" title="完成框图">完成 ✓</button>
+    </div>
+
+    <div id="actionbar" class="bar hidden">
+      <button id="btn-pin" title="把截图固定在屏幕上，可移动、缩放">📌 贴图</button>
+      <button id="btn-draw" title="在截图上画框线标注">⬜ 框图</button>
+      <button id="btn-copy" title="复制到剪贴板，可在 Word 等处粘贴">📋 复制</button>
+      <button id="btn-ocr" title="调用 AI 大模型识别图片文字，表格自动转 Markdown">🔤 OCR</button>
+      <button id="btn-save" title="另存为其他位置（截图已自动保存到历史）">💾 另存为</button>
+    </div>
+  </main>
+
+  <!-- 历史记录视图 -->
+  <main id="view-history" class="view hidden">
+    <div class="hist-head">
+      <span id="hist-count" class="hist-count"></span>
+    </div>
+    <div id="hist-grid" class="hist-grid"></div>
+  </main>
+
+  <!-- 设置视图 -->
+  <main id="view-settings" class="view hidden">
+    <div class="settings-body">
+      <section class="settings-card">
+        <h3>🔤 OCR 大模型接口</h3>
+        <div class="settings-row">
+          <label>API 地址</label>
+          <input id="ocr-base" type="text" placeholder="如 https://api.moonshot.cn/v1（OpenAI 兼容接口）" />
+        </div>
+        <div class="settings-row">
+          <label>API Key</label>
+          <input id="ocr-key" type="password" placeholder="各平台申请的密钥" />
+        </div>
+        <div class="settings-row">
+          <label>模型</label>
+          <input id="ocr-model" type="text" placeholder="视觉模型，如 qwen-vl-plus / moonshot-v1-8k-vision-preview" />
+        </div>
+        <p class="settings-tip">
+          需为支持图片输入（多模态）的模型。常用组合：通义千问 dashscope.aliyuncs.com/compatible-mode/v1 + qwen-vl-plus；Kimi api.moonshot.cn/v1 + moonshot-v1-8k-vision-preview；OpenAI api.openai.com/v1 + gpt-4o。
+        </p>
+        <div class="settings-actions">
+          <button id="ocr-save" class="primary">保存 OCR 设置</button>
+        </div>
+      </section>
+      <section class="settings-card">
+        <h3>🗑 截图历史清理</h3>
+        <div class="settings-row">
+          <label>保留天数（0 = 永久保留）</label>
+          <input id="cfg-days" type="number" min="0" max="3650" />
+        </div>
+        <div class="settings-actions">
+          <button id="cfg-save" class="primary">保存设置</button>
+          <button id="btn-cleanup">立即清理</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 全屏查看器 -->
+  <div id="viewer" class="viewer hidden">
+    <div id="viewer-stage" class="viewer-stage">
+      <img id="viewer-img" alt="全屏预览" />
+    </div>
+    <div class="viewer-bar">
+      <span id="viewer-name" class="viewer-name"></span>
+      <button id="v-copy">复制</button>
+      <button id="v-pin">贴图</button>
+      <button id="v-open">打开文件夹</button>
+      <button id="v-delete">删除</button>
+      <button id="v-close" class="primary">关闭</button>
+    </div>
+  </div>
+
+  <!-- OCR 识别结果 -->
+  <div id="ocr-view" class="viewer hidden">
+    <div class="ocr-stage">
+      <pre id="ocr-text">正在识别图片中的文字…</pre>
+    </div>
+    <div class="viewer-bar">
+      <span class="viewer-name">🔤 OCR 文字识别（Markdown）</span>
+      <button id="ocr-copy">复制识别结果</button>
+      <button id="ocr-close" class="primary">关闭</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="index.js?v=20260918"></script>
+</body>
+</html>

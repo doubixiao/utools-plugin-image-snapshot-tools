@@ -1,0 +1,27 @@
+{
+  "main": "index.html",
+  "logo": "logo.png",
+  "preload": "preload.js",
+  "pluginSetting": {
+    "single": true,
+    "height": 400
+  },
+  "features": [
+    {
+      "code": "screenshot",
+      "explain": "截图、贴图、框图、复制、OCR、保存",
+      "icon": "logo.png",
+      "cmds": [
+        "截图"
+      ]
+    },
+    {
+      "code": "history",
+      "explain": "查看历史截图与 OCR 识别结果",
+      "icon": "logo.png",
+      "cmds": [
+        "截图历史"
+      ]
+    }
+  ]
+}
