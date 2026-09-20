@@ -1,0 +1,24 @@
+{
+  "name": "image-snapshot-tools",
+  "version": "1.0.1",
+  "description": "基于 uTools 的截图工具 - 贴图/框图/OCR/历史记录",
+  "main": "index.html",
+  "scripts": {
+    "dev": "echo 'Use uTools Developer Tools for development'",
+    "build": "echo 'Build via uTools Developer Tools'"
+  },
+  "keywords": [
+    "screenshot",
+    "ocr",
+    "uTools",
+    "plugin",
+    "贴图",
+    "OCR"
+  ],
+  "author": "mingquan.liu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

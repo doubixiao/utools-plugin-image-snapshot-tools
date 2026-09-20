@@ -163,7 +163,7 @@ function requestCapture(force) {
   // OCR 进行中或有未查看的识别结果：不自动截图，保留现场等用户回来
   if (!force && (ocrRunning || ocrPendingView)) return
   if (!force && Date.now() - lastCaptureEnd < RECENT_CAPTURE_MS) return // 刚截完，忽略联动触发
-  console.log('[截图] 触发（' + (force ? '手动' : '自动') + '）')
+  console.log('[截图] 触发（' + (force ? '手动' : '自动') + ')')
   captureTimer = setTimeout(() => {
     captureTimer = null
     doCapture()
@@ -175,6 +175,14 @@ function doCapture() {
   console.log('[截图] 开始调用 screenCapture')
   capturing = true
   window.__capturing = true
+
+  // 截图前隐藏主窗口，避免遮挡截图区域
+  try {
+    utools.hideMainWindow()
+  } catch (err) {
+    console.error('[截图] 隐藏主窗口失败:', err)
+  }
+
   // 新截图开始：清除上一次的 OCR 现场
   ocrAborted = true
   ocrRunning = false
@@ -193,6 +201,16 @@ function doCapture() {
       clearTimeout(captureTimer) // 取消可能已排队的重复截图
       captureTimer = null
       console.log('[截图] 回调:', image ? '已截图' : '已取消')
+
+      // 截图完成后恢复主窗口显示
+      try {
+        if (utools.showMainWindow) {
+          utools.showMainWindow()
+        }
+      } catch (err) {
+        console.error('[截图] 恢复主窗口失败:', err)
+      }
+
       capturing = false
       window.__capturing = false
       lastCaptureEnd = Date.now()
@@ -208,6 +226,14 @@ function doCapture() {
     clearTimeout(captureWatchdog)
     captureWatchdog = setTimeout(() => {
       console.log('[截图] 回调超时，自动复位')
+      // 超时也要恢复主窗口
+      try {
+        if (utools.showMainWindow) {
+          utools.showMainWindow()
+        }
+      } catch (err) {
+        console.error('[截图] 恢复主窗口失败:', err)
+      }
       capturing = false
       window.__capturing = false
       lastCaptureEnd = Date.now()
@@ -219,6 +245,16 @@ function doCapture() {
   } catch (err) {
     clearTimeout(captureWatchdog)
     console.log('[截图] 调用异常:', err)
+
+    // 异常情况也要恢复主窗口
+    try {
+      if (utools.showMainWindow) {
+        utools.showMainWindow()
+      }
+    } catch (err2) {
+      console.error('[截图] 恢复主窗口失败:', err2)
+    }
+
     capturing = false
     window.__capturing = false
     phStatus.textContent = '截图失败：' + err.message
