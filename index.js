@@ -163,7 +163,7 @@ function requestCapture(force) {
   // OCR 进行中或有未查看的识别结果：不自动截图，保留现场等用户回来
   if (!force && (ocrRunning || ocrPendingView)) return
   if (!force && Date.now() - lastCaptureEnd < RECENT_CAPTURE_MS) return // 刚截完，忽略联动触发
-  console.log('[截图] 触发（' + (force ? '手动' : '自动') + ')')
+  console.log('[截图] 触发（' + (force ? '手动' : '自动') + '）')
   captureTimer = setTimeout(() => {
     captureTimer = null
     doCapture()
